@@ -22,6 +22,7 @@
 #include <libsolidity/analysis/SemVerHandler.h>
 #include <libsolidity/interface/ErrorReporter.h>
 #include <libsolidity/interface/Version.h>
+#include <boost/algorithm/cxx11/all_of.hpp>
 
 using namespace std;
 using namespace dev;
@@ -260,6 +261,18 @@ bool SyntaxChecker::visit(VariableDeclaration const& _declaration)
 	{
 		m_errorReporter.syntaxError(_declaration.location(), "Use of the \"var\" keyword is disallowed.");
 	}
+	return true;
+}
+
+bool SyntaxChecker::visit(VariableDeclarationStatement const& _statement)
+{
+	// Report if non of the variable components in the tuple have a name (only possible via deprecated "var")
+	if (boost::algorithm::all_of(_statement.declarations(), [](const ASTPointer<VariableDeclaration>& d) { return d == nullptr; }))
+		m_errorReporter.syntaxError(
+			_statement.location(),
+			"The use of the \"var\" keyword is disallowed. The declaration part of the statement can be removed, since it is empty."
+		);
+
 	return true;
 }
 
