@@ -277,7 +277,11 @@ void RPCSession::test_rewindToBlock(size_t _blockNr)
 void RPCSession::test_mineBlocks(int _number)
 {
 	u256 startBlock = fromBigEndian<u256>(fromHex(rpcCall("eth_blockNumber").asString()));
+	auto start = chrono::system_clock::now();
 	BOOST_REQUIRE(rpcCall("test_mineBlocks", { to_string(_number) }, true) == true);
+	auto elapsed = chrono::system_clock::now() - start;
+	long long microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
+	BOOST_TEST_MESSAGE(string("Time: ") + string(boost::unit_test::framework::current_test_case().p_name) + " " + to_string(microseconds));
 
 	// We auto-calibrate the time it takes to mine the transaction.
 	// It would be better to go without polling, but that would probably need a change to the test client
