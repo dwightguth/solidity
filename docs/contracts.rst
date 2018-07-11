@@ -571,7 +571,7 @@ Like any function, the fallback function can execute complex operations as long 
     but do not define a fallback function
     throw an exception, sending back the Ether (this was different
     before Solidity v0.4.0). So if you want your contract to receive Ether,
-    you have to implement a fallback function.
+    you have to implement a payable fallback function.
 
 .. warning::
     A contract without a payable fallback function can receive Ether as a recipient of a `coinbase transaction` (aka `miner block reward`)
@@ -607,11 +607,10 @@ Like any function, the fallback function can execute complex operations as long 
             address(test).call(abi.encodeWithSignature("nonExistingFunction()"));
             // results in test.x becoming == 1.
 
-            // The following will not compile, but even
-            // if someone sends ether to that contract,
+            // If someone sends ether to that contract,
             // the transaction will fail and reject the
             // Ether.
-            //address(test).send(2 ether);
+            address(test).send(2 ether);
         }
     }
 
